@@ -1,0 +1,9 @@
+node_modules/
+.next
+coverage
+build/
+dist/
+out/
+next-env.d.ts
+.env*
+supabase/.temp/
