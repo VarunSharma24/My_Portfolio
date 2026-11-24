@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { adminApi } from "@/lib/auth/admin";
 import { z } from "zod";
@@ -153,7 +153,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ tab
       { status: 400, headers: noStore },
     );
   }
-  revalidateTag("public-portfolio", "max");
+  revalidateTag("public-portfolio", { expire: 0 });
+  revalidatePath("/", "page");
   return NextResponse.json({ data }, { status: 201, headers: noStore });
 }
 export async function PATCH(request: Request, { params }: { params: Promise<{ table: string }> }) {
@@ -237,7 +238,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ta
       media.column,
     ));
   }
-  revalidateTag("public-portfolio", "max");
+  revalidateTag("public-portfolio", { expire: 0 });
+  revalidatePath("/", "page");
   return NextResponse.json({ data, cleanupWarning }, { headers: noStore });
 }
 export async function DELETE(request: Request, { params }: { params: Promise<{ table: string }> }) {
@@ -271,6 +273,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ t
     !!media &&
     !!mediaPath &&
     !(await removeMedia(auth.supabase, media.bucket, mediaPath, table, media.column));
-  revalidateTag("public-portfolio", "max");
+  revalidateTag("public-portfolio", { expire: 0 });
+  revalidatePath("/", "page");
   return NextResponse.json({ ok: true, cleanupWarning }, { headers: noStore });
 }

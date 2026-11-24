@@ -5424,3 +5424,198 @@ body {
     transition: none !important;
   }
 }
+
+/* Keep the rotating hero role on one line without changing the hero grid. */
+.hero-role {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  gap: 0.55em;
+  min-height: 1.5em;
+}
+.role-prefix {
+  flex: 0 0 auto;
+}
+.role-value {
+  display: inline-block;
+  flex: 0 0 25ch;
+  width: 25ch;
+  max-width: calc(100vw - 110px);
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+.role-label {
+  display: inline-block;
+  animation: role-enter 260ms ease both;
+}
+@keyframes role-enter {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .role-label { animation: none; }
+}
+.public-data-error {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid #f0b66a55;
+  border-radius: 8px;
+  background: #f0b66a10;
+  color: #f3d3a6;
+  font-size: 13px;
+}
+
+/* Anchor Z to the viewport with room for safe areas and a scrollable message pane. */
+.z-dock {
+  position: fixed;
+  z-index: 80;
+  inset: 0;
+  width: auto;
+  height: auto;
+  overflow: clip;
+  pointer-events: none;
+}
+.z-launcher {
+  position: absolute;
+  z-index: 81;
+  right: max(20px, calc(env(safe-area-inset-right, 0px) + 16px));
+  bottom: max(20px, calc(env(safe-area-inset-bottom, 0px) + 16px));
+  width: 58px;
+  height: 58px;
+  max-width: calc(
+    100vw - 32px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)
+  );
+  pointer-events: auto;
+}
+.z-prompt {
+  position: absolute;
+  z-index: 82;
+  right: max(20px, calc(env(safe-area-inset-right, 0px) + 16px));
+  bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+  max-width: calc(
+    100vw - 32px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)
+  );
+  pointer-events: auto;
+}
+.z-panel {
+  right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: max(92px, calc(env(safe-area-inset-bottom, 0px) + 82px));
+  width: min(
+    390px,
+    calc(100vw - 32px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))
+  );
+  max-width: calc(
+    100vw - 32px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)
+  );
+  height: min(
+    590px,
+    calc(100dvh - 104px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))
+  );
+  max-height: calc(
+    100dvh - 104px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
+  );
+  min-width: 0;
+  min-height: 0;
+}
+.z-messages {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.z-message,
+.z-message p,
+.z-form-wrap,
+.z-panel form {
+  min-width: 0;
+  max-width: 100%;
+}
+.z-message p {
+  flex: 1 1 0;
+  max-width: calc(100% - 33px);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.z-panel input,
+.z-panel textarea,
+.z-panel button[type="submit"] {
+  min-width: 0;
+  max-width: 100%;
+}
+@media (max-width: 760px) {
+  .z-panel {
+    bottom: max(92px, calc(env(safe-area-inset-bottom, 0px) + 82px));
+    height: min(
+      620px,
+      calc(100dvh - 104px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))
+    );
+    max-height: calc(
+      100dvh - 104px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
+    );
+  }
+}
+
+/* Keep the complete HUD outline visible around the terminal at every size. */
+.hero-art {
+  isolation: isolate;
+  overflow: visible;
+}
+.hero-art::before {
+  z-index: 0;
+  inset: 4% 1%;
+  border: 1px solid #a99aff45;
+  border-radius: 14px;
+  clip-path: none;
+  background:
+    linear-gradient(135deg, #a78bfa0c, transparent 40%, #67e8f90b),
+    radial-gradient(ellipse at 76% 18%, #67e8f911, transparent 54%);
+  box-shadow: inset 0 0 34px #8b74ee09, 0 0 28px #50dff10b;
+}
+.hero-art::after {
+  z-index: 3;
+}
+.code-window {
+  border: 1px solid #a99aff48;
+  background: linear-gradient(145deg, #191828f5 0%, #0b1017f5 76%);
+  box-shadow:
+    0 30px 82px #000a,
+    0 0 48px #8b68f51c,
+    0 0 1px 1px #62e4f40c,
+    inset 0 1px #ffffff16;
+  backdrop-filter: blur(14px);
+}
+.role-value {
+  display: inline-flex;
+  flex: 0 1 25ch;
+  align-items: baseline;
+  width: 25ch;
+  min-width: 0;
+  max-width: calc(100vw - 110px);
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+.role-label {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+.role-cursor {
+  flex: 0 0 0.55em;
+  width: 0.55em;
+  height: 1em;
+  margin-left: 0.08em;
+  background: #8ef2ff;
+  box-shadow: 0 0 12px #68e8ff88;
+  animation: cursor-blink 850ms steps(2, start) infinite;
+}
+@media (max-width: 760px) {
+  .hero-art::before {
+    inset: 8px 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .role-cursor {
+    animation: none;
+  }
+}

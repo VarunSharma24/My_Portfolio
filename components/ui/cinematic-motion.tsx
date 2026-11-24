@@ -3,7 +3,13 @@
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
-const roles = ["Ethical Hacker", "Developer", "AI Builder", "Technology Enthusiast"];
+const roles = [
+  "Ethical Hacker",
+  "Developer",
+  "AI Explorer",
+  "Security Researcher",
+  "Technology Enthusiast",
+];
 
 export function CinematicName() {
   const reduced = useReducedMotion();
@@ -32,51 +38,52 @@ export function CinematicName() {
 export function RoleTyper() {
   const reduced = useReducedMotion();
   const [roleIndex, setRoleIndex] = useState(0);
-  const [visible, setVisible] = useState("");
+  const [visibleCharacters, setVisibleCharacters] = useState(roles[0].length);
+  const [deleting, setDeleting] = useState(false);
+  const cycleStarted = useRef(false);
 
   useEffect(() => {
     if (reduced) return;
-    let role = 0;
-    let length = 0;
-    let deleting = false;
-    let timer = 0;
-    const tick = () => {
-      const current = roles[role];
-      if (!deleting) {
-        length += 1;
-        setVisible(current.slice(0, length));
-        if (length >= current.length) {
-          deleting = true;
-          timer = window.setTimeout(tick, 1350);
-          return;
-        }
+    if (!cycleStarted.current) {
+      cycleStarted.current = true;
+      setVisibleCharacters(0);
+      return;
+    }
+
+    const currentRole = roles[roleIndex];
+    const delay =
+      !deleting && visibleCharacters === currentRole.length
+        ? 1250
+        : deleting && visibleCharacters === 0
+          ? 160
+          : deleting
+            ? 36
+            : 78;
+    const timeout = window.setTimeout(() => {
+      if (!deleting && visibleCharacters === currentRole.length) {
+        setDeleting(true);
+      } else if (deleting && visibleCharacters === 0) {
+        setRoleIndex((index) => (index + 1) % roles.length);
+        setDeleting(false);
       } else {
-        length -= 1;
-        setVisible(current.slice(0, length));
-        if (length <= 0) {
-          deleting = false;
-          role = (role + 1) % roles.length;
-          setRoleIndex(role);
-          timer = window.setTimeout(tick, 250);
-          return;
-        }
+        setVisibleCharacters((count) => count + (deleting ? -1 : 1));
       }
-      timer = window.setTimeout(tick, deleting ? 34 : 72);
-    };
-    timer = window.setTimeout(tick, 720);
-    return () => window.clearTimeout(timer);
-  }, [reduced]);
+    }, delay);
+
+    return () => window.clearTimeout(timeout);
+  }, [deleting, reduced, roleIndex, visibleCharacters]);
+
+  const currentRole = roles[roleIndex];
+  const visibleRole = reduced ? roles[0] : currentRole.slice(0, visibleCharacters);
 
   return (
-    <p className="hero-role mono" aria-label={`Role: ${roles[roleIndex]}`}>
+    <p className="hero-role mono" aria-label={`Role: ${reduced ? roles[0] : currentRole}`}>
       <span className="role-prefix">ROLE /</span>
       <span aria-hidden="true" className="role-value">
-        {reduced ? roles[0] : visible}
-        <i className="terminal-cursor" />
+        <span className="role-label">{visibleRole}</span>
+        <span className="role-cursor" />
       </span>
-      <span className="sr-only" aria-live="polite">
-        {roles[roleIndex]}
-      </span>
+      <span className="sr-only">{reduced ? roles[0] : currentRole}</span>
     </p>
   );
 }
@@ -88,7 +95,11 @@ export function TerminalReveal({ children }: { children: ReactNode }) {
       className="code-window card"
       initial={reduced ? false : { opacity: 0, y: 18, clipPath: "inset(0 0 100% 0)" }}
       animate={{ opacity: 1, y: 0, clipPath: "inset(0 0 0% 0)" }}
-      transition={{ duration: reduced ? 0 : 0.8, delay: reduced ? 0 : 0.85, ease: [0.22, 1, 0.36, 1] }}
+      transition={{
+        duration: reduced ? 0 : 0.8,
+        delay: reduced ? 0 : 0.85,
+        ease: [0.22, 1, 0.36, 1],
+      }}
     >
       {children}
     </motion.div>

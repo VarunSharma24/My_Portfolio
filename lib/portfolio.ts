@@ -1,6 +1,7 @@
 import "server-only";
 import { unstable_cache } from "next/cache";
 import { createPublicClient } from "@/lib/supabase/public";
+import { sortByDate } from "@/lib/portfolio-sorting";
 import type {
   Achievement,
   Certification,
@@ -30,7 +31,7 @@ export async function getPortfolioData() {
   try {
     const supabase = createPublicClient();
     const [p, projects, groups, certificates, achievements, updates] = await Promise.all([
-      supabase.from("profiles").select("*").limit(1).maybeSingle(),
+      supabase.from("profiles").select("*").eq("is_public", true).limit(1).maybeSingle(),
       supabase.from("projects").select("*").eq("published", true).order("display_order"),
       supabase.from("skill_groups").select("*,skills(*)").order("display_order"),
       supabase
@@ -42,26 +43,39 @@ export async function getPortfolioData() {
         .from("achievements")
         .select("*")
         .eq("published", true)
-        .order("achievement_date", { ascending: false }),
+        .order("achievement_date", { ascending: false, nullsFirst: false }),
       supabase
         .from("updates")
         .select("*")
         .eq("published", true)
         .order("published_at", { ascending: false }),
     ]);
+    if ([p, projects, groups, certificates, achievements, updates].some((result) => result.error))
+      throw new Error("A public portfolio query failed.");
     return {
+      loadError: false,
       profile: (p.data as Profile | null) ?? fallbackProfile,
       projects: (projects.data as Project[] | null) ?? [],
       groups: ((groups.data as (SkillGroup & { skills: Skill[] })[] | null) ?? []).map((g) => ({
         ...g,
         skills: [...(g.skills ?? [])].sort((a, b) => a.display_order - b.display_order),
       })),
-      certificates: (certificates.data as Certification[] | null) ?? [],
-      achievements: (achievements.data as Achievement[] | null) ?? [],
-      updates: (updates.data as Update[] | null) ?? [],
+      certificates: sortByDate(
+        (certificates.data as Certification[] | null) ?? [],
+        (item) => item.issue_date,
+      ),
+      achievements: sortByDate(
+        (achievements.data as Achievement[] | null) ?? [],
+        (item) => item.achievement_date,
+      ),
+      updates: sortByDate(
+        (updates.data as Update[] | null) ?? [],
+        (item) => item.published_at || item.updated_at,
+      ),
     };
   } catch {
     return {
+      loadError: true,
       profile: fallbackProfile,
       projects: [],
       groups: [],
@@ -94,9 +108,9 @@ export const getAssistantPortfolioData = unstable_cache(
           .limit(16),
         supabase
           .from("achievements")
-          .select("title,description,achievement_date,external_url")
+          .select("id,title,description,achievement_date,external_url")
           .eq("published", true)
-          .order("achievement_date", { ascending: false })
+          .order("achievement_date", { ascending: false, nullsFirst: false })
           .limit(16),
         supabase
           .from("updates")
@@ -120,7 +134,10 @@ export const getAssistantPortfolioData = unstable_cache(
           .map((skill) => skill.name),
       })),
       certificates: certificates.data ?? [],
-      achievements: achievements.data ?? [],
+      achievements: sortByDate(
+        achievements.data ?? [],
+        (item) => item.achievement_date,
+      ),
       updates: updates.data ?? [],
     };
   },

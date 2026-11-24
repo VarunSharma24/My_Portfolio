@@ -67,6 +67,7 @@ export interface Update {
   content: string;
   published_at: string | null;
   published: boolean;
+  updated_at: string;
 }
 export interface Enquiry {
   id: string;

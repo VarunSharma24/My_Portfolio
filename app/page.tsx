@@ -19,12 +19,17 @@ import {
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const { profile, projects, groups, certificates, achievements, updates } =
+  const { profile, projects, groups, certificates, achievements, updates, loadError } =
     await getPortfolioData();
   return (
     <>
       <ScrollProgress />
       <SiteNav />
+      {loadError && (
+        <div className="container public-data-error" role="status">
+          Some portfolio content could not be loaded. Please refresh the page to try again.
+        </div>
+      )}
       <main>
         <section className="hero" id="home">
           <div className="hero-grid grid-bg" />
@@ -34,8 +39,8 @@ export default async function HomePage() {
               <CinematicName />
               <RoleTyper />
               <p className="hero-intro">
-                I explore cybersecurity, build software, and experiment with AI to create useful
-                technology. Always learning, testing, and building.
+                {profile.introduction ||
+                  "I explore cybersecurity, build software, and experiment with AI to create useful technology. Always learning, testing, and building."}
               </p>
               <div className="hero-actions">
                 <a className="button button-primary" href="#projects">
@@ -124,7 +129,7 @@ export default async function HomePage() {
         <section className="section" id="about">
           <Reveal className="container about-grid">
             <div className="about-heading">
-              <span className="eyebrow">A little about me</span>
+              <span className="eyebrow">A LITTLE ABOUT ME</span>
               <h2 className="section-title about-display">
                 CURIOSITY IS A <em>PROCESS.</em>
               </h2>
@@ -136,15 +141,11 @@ export default async function HomePage() {
                   Hey, I&apos;m Varun — a young ethical hacking enthusiast, developer, and technology
                   explorer fascinated by what happens beneath the surface.
                 </p>
-              </RevealItem>
-              <RevealItem className="about-statement" delay={0.1} direction="right">
                 <p>
                   Cybersecurity is my biggest interest. I explore web security, learn how
-                  applications communicate, and study responsible ways to understand vulnerabilities
-                  and improve security.
+                  applications communicate, and study responsible ways to understand
+                  vulnerabilities and improve security.
                 </p>
-              </RevealItem>
-              <RevealItem className="about-statement" delay={0.1}>
                 <p>
                   I also build software and experiment with AI, turning curiosity into practical
                   projects and learning through every iteration.
@@ -178,7 +179,7 @@ export default async function HomePage() {
               <div>
                 <h2 className="section-title">Projects that teach me something.</h2>
                 <p className="section-lead">
-                  A growing collection of things I’ve designed, built, and learned from.
+                  Projects I’ve designed, built, and learned from.
                 </p>
               </div>
               <span className="count-note mono">
@@ -262,8 +263,8 @@ export default async function HomePage() {
             ) : (
               <div className="empty-state card">
                 <div className="empty-mark">✳</div>
-                <h3>Work in progress</h3>
-                <p>Projects will appear here as they’re published.</p>
+                <h3>No projects published yet.</h3>
+                <p>Published projects appear here.</p>
               </div>
             )}
           </Reveal>
@@ -271,11 +272,11 @@ export default async function HomePage() {
 
         <section className="section" id="skills">
           <Reveal className="container">
-            <span className="eyebrow">Tools of the trade</span>
+            <span className="eyebrow">Current focus · skills &amp; interests</span>
             <h2 className="section-title">Skills & interests.</h2>
             <p className="section-lead">
-              A living toolkit, shaped by projects and ongoing curiosity. No scores — just areas I
-              work with and explore.
+              Cybersecurity, software development, artificial intelligence, and emerging
+              technologies.
             </p>
             <div className="skills-grid">
               {groups.length ? (
@@ -305,8 +306,8 @@ export default async function HomePage() {
                 ))
               ) : (
                 <article className="skill-card card skill-empty">
-                  <h3>Growing toolkit</h3>
-                  <p>Skills will be added here as they are curated.</p>
+                  <h3>Skill categories</h3>
+                  <p>No skill categories published yet.</p>
                 </article>
               )}
             </div>
@@ -360,8 +361,8 @@ export default async function HomePage() {
                 ))
               ) : (
                 <div className="empty-state card">
-                  <h3>Nothing published yet</h3>
-                  <p>Verified certificates will be shared here when ready.</p>
+                  <h3>No certificates published yet.</h3>
+                  <p>Published certificates are listed here with verification details.</p>
                 </div>
               )}
             </div>
@@ -419,8 +420,8 @@ export default async function HomePage() {
                   })
                 ) : (
                   <div className="empty-state card">
-                    <h3>Milestones ahead</h3>
-                    <p>Achievements will appear here when there’s something to share.</p>
+                    <h3>No achievements published yet.</h3>
+                    <p>Published achievements appear here.</p>
                   </div>
                 )}
               </div>
@@ -460,8 +461,8 @@ export default async function HomePage() {
                 ))
               ) : (
                 <div className="empty-state card">
-                  <h3>More soon</h3>
-                  <p>Published notes and updates will show up here.</p>
+                  <h3>No updates published yet.</h3>
+                  <p>Published notes and updates appear here.</p>
                 </div>
               )}
             </div>
